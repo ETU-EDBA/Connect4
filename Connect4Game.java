@@ -1,10 +1,10 @@
 import java.util.Arrays;
-
+import java.util.concurrent.TimeUnit;
 /**
  * Connect4Game.java
- * 
+ *
  * Represents the state of the Connect 4 game.
- * 
+ *
  * @author Delos Chang
  *
  */
@@ -24,7 +24,7 @@ public class Connect4Game implements Connect4State{
 
 	/**
 	 * Constructs game in initial state
-	 * 
+	 *
 	 * @param playerNum the player whose move it is
 	 * @param thePlayers the player objects
 	 * @param aView the view in the model-view-controller model
@@ -46,7 +46,7 @@ public class Connect4Game implements Connect4State{
 
 	/**
 	 * Construct the game with input states
-	 * 
+	 *
 	 * @param playerNum the player whose move it is
 	 * @param thePlayers the player objects
 	 * @param initialBoard the board input with requisite pieces
@@ -80,7 +80,7 @@ public class Connect4Game implements Connect4State{
 	 * The first subscript is the row number and the second the column number.
 	 * The bottom of the board is row 0 and the top is row ROWS-1.
 	 * The left side of the board is column 0 and the right side is column COLS-1.
-	 * 
+	 *
 	 * @return the board
 	 */
 	public char[][] getBoard() {
@@ -121,7 +121,12 @@ public class Connect4Game implements Connect4State{
 	@Override
 	public boolean isValidMove(int col) {
 		// move is valid if the top column isn't full
-		return !isColumnFull(col);
+		if (col >= 0 && col < 7){
+			return !isColumnFull(col);
+		}else{
+			return false;
+		}
+
 	}
 
 	/**
@@ -137,7 +142,7 @@ public class Connect4Game implements Connect4State{
 			// Switch player
 			playerToMoveNum = 1 - playerToMoveNum;
 
-			// Switch evaluation for player and computer 
+			// Switch evaluation for player and computer
 			evalValue = -1 * evalValue;
 
 			// Evaluation steps
@@ -151,16 +156,16 @@ public class Connect4Game implements Connect4State{
 			// Update latest row/cols
 			latestRow = openRow;
 			latestCol = col;
-		} else { 
+		} else {
 			// because it was not a valid move
 			throw new IllegalStateException("Column is full!");
 		}
 	}
 
-	/** 
+	/**
 	 * Find the first empty row in a column
 	 * -1 if the column is full (no empty row)
-	 * 
+	 *
 	 * @param col the column to check
 	 */
 	private int findOpenRow(int col){
@@ -176,7 +181,7 @@ public class Connect4Game implements Connect4State{
 
 	/**
 	 * Finds the first occupied slot of a column
-	 * 
+	 *
 	 * @param col the column to check
 	 * @return the first occupied slot of a column
 	 */
@@ -195,7 +200,7 @@ public class Connect4Game implements Connect4State{
 
 	/**
 	 * Calibrates the position after a move is made (called with makeMove)
-	 * 
+	 *
 	 * @param openRow the row in which the move will be made (the first open row in a col)
 	 * @param column the column in which the move was made
 	 * @return a new evaluation value
@@ -225,7 +230,7 @@ public class Connect4Game implements Connect4State{
 
 
 		// evaluate diagonal 1
-		int diagValueOne = evalPossibilities(mainPlayer, opponent, offsetLeftColumn, offsetRightColumn, 
+		int diagValueOne = evalPossibilities(mainPlayer, opponent, offsetLeftColumn, offsetRightColumn,
 				offsetOpenRow, diagonalDelta);
 
 		// change offset values for next diagonal
@@ -238,7 +243,7 @@ public class Connect4Game implements Connect4State{
 		diagonalDelta = -1;
 
 		// evaluate diagonal 2 (opp direction)
-		int diagValueTwo = evalPossibilities(mainPlayer, opponent, offsetLeftColumn, 
+		int diagValueTwo = evalPossibilities(mainPlayer, opponent, offsetLeftColumn,
 				offsetRightColumn, offsetOpenRow, diagonalDelta);
 
 		// evaluate vertical Connect 4 possibilities
@@ -251,9 +256,9 @@ public class Connect4Game implements Connect4State{
 	}
 
 	/**
-	 * Method for evaluating the Connect 4 verticals and assigning them based on 
+	 * Method for evaluating the Connect 4 verticals and assigning them based on
 	 * their strength i.e. how close they form a connect 4
-	 * 
+	 *
 	 * @param mainPlayer the player whose turn it is
 	 * @param opponent the player's opponent
 	 * @param row row we are checking
@@ -292,7 +297,7 @@ public class Connect4Game implements Connect4State{
 	/**
 	 * Public helper method to apply weights after looking at Connect 4
 	 * possibilities
-	 * 
+	 *
 	 * @param playerCount the number of pieces player has in the connect 4 line
 	 * @param opponentCount the number of pieces opponent has in the connect 4 line
 	 * @param sum the weighted sum so far
@@ -311,7 +316,7 @@ public class Connect4Game implements Connect4State{
 
 	/**
 	 * Evaluates the possibilities for diagonal and horizontal connect fours
-	 * 
+	 *
 	 * @param mainPlayer the main player
 	 * @param opponent the other player
 	 * @param leftBound the leftside bound of the connect 4
@@ -320,7 +325,7 @@ public class Connect4Game implements Connect4State{
 	 * @param offsetRow the offset for diagonals (1 or -1), 0 for horizontals
 	 * @return
 	 */
-	private int evalPossibilities(char mainPlayer, char opponent, int leftBound, 
+	private int evalPossibilities(char mainPlayer, char opponent, int leftBound,
 			int rightBound, int currentRow, int offsetRow){
 
 		// declare local variables
@@ -329,7 +334,7 @@ public class Connect4Game implements Connect4State{
 		int playerCount = 0;
 		int sum = 0;
 		int checkColumn = leftBound;
-		int checkRow = currentRow; 
+		int checkRow = currentRow;
 
 		// -4 or 4 depending on which type of diagonal
 		// 0 if checking horizontal
@@ -341,7 +346,7 @@ public class Connect4Game implements Connect4State{
 
 		// ++ for row and column for diagonals
 		// ++ for column for horizontals
-		for (checkColumn = checkColumn; 
+		for (checkColumn = checkColumn;
 				checkColumn <= leftBound + 3;
 				checkRow += offsetRow) {
 
@@ -365,7 +370,7 @@ public class Connect4Game implements Connect4State{
 				checkRow += offsetRow){
 			if (board[(checkRow - diagonalDelta)][(checkColumn - 4)] == opponent){
 				opponentCount = opponentCount -1;
-			} 
+			}
 
 			if (board[(checkRow - diagonalDelta)][(checkColumn - 4)] == mainPlayer) {
 				playerCount = playerCount -1;
@@ -379,7 +384,7 @@ public class Connect4Game implements Connect4State{
 				playerCount = playerCount + 1;
 			}
 
-			// apply the weights 
+			// apply the weights
 			sum = applyWeights(playerCount, opponentCount, sum);
 
 			checkColumn = checkColumn + 1;
@@ -393,7 +398,7 @@ public class Connect4Game implements Connect4State{
 
 	/**
 	 * Undo the move to avoid creating a new state each time
-	 * 
+	 *
 	 * @param column column to undo
 	 * @param stateEval static evaluation at that time
 	 */
@@ -412,7 +417,7 @@ public class Connect4Game implements Connect4State{
 
 	/**
 	 * Is column full?
-	 * 
+	 *
 	 * @param col the column to check
 	 * @return true if the column is full
 	 */
@@ -432,7 +437,7 @@ public class Connect4Game implements Connect4State{
 
 	/**
 	 * Evaluates four-in-row for game-over method
-	 * 
+	 *
 	 * @param row latest row that a move was made on
 	 * @param column latest column that a move was made on
 	 * @param rowOffset a row offset to calculate different connect 4 possibilities
@@ -445,7 +450,7 @@ public class Connect4Game implements Connect4State{
 		int winCounter = 0; // counts to 4 for win
 
 		// Find opp ends for the possible Connect 4
-		int oppRow = 3 * rowOffset + row; 
+		int oppRow = 3 * rowOffset + row;
 		int oppColumn = 3 * colOffset + column;
 
 		// conditions where Connect 4 is impossible
@@ -453,7 +458,7 @@ public class Connect4Game implements Connect4State{
 		// adjusted offset for row/col is < 0 or > maximum
 		if ( (movesDone < 7 ) || (oppRow >= ROWS) || (oppColumn >= COLS) ||
 				(oppRow < 0) || (oppColumn < 0) ||
-				(row < 0) || (column < 0) || 
+				(row < 0) || (column < 0) ||
 				(row >= ROWS) || (column >= COLS)){
 			return false;
 		}
@@ -464,7 +469,7 @@ public class Connect4Game implements Connect4State{
 				winCounter++;
 			}
 
-			// Adjust offsets and look for the next piece 
+			// Adjust offsets and look for the next piece
 			// that would lead to a four-in-row.
 			row += rowOffset;
 			column += colOffset;
@@ -528,7 +533,7 @@ public class Connect4Game implements Connect4State{
 
 			int new_eval = gameOne.grabEvalValue();
 			int compEval = ComputerConnect4Player.evaluate(gameTwo);
-			
+
 			System.out.println("The following evaluation numbers in the game should match.");
 			System.out.println("Player One " + new_eval);
 			System.out.println("Player Two " + compEval);
