@@ -1,13 +1,15 @@
 public class ComputerConnect4Player extends Player {
 	private int depth;  // depth to search at
+	public static boolean hChoice=false; //heuristic choice
 
 	// my weights
 	// need to be public/package for testing static evaluation func in Connect4Game.java
-	public static final int[] HOW_GOOD = {0, 2, 10^2, 10^3, 10^8}; // index is # of unblocked four-in-row potentials
 
 	// the closer a piece is to the center, the more 4-in-row permutations available.
 	// i.e.., generally center piece is most valuable
 	private static final int[] movesByCol = { 3, 4, 2, 5, 1, 6, 0 };
+	private static final int WEIGTH_OF_THREAT = 10^3;
+	private static final int WEIGTH_OF_WINNING = 10^8;
 
 	/**
 	 * Create a computer player with a given name
@@ -21,7 +23,7 @@ public class ComputerConnect4Player extends Player {
 	@Override
 	public int getMove(Connect4State state, Connect4View view) {
 		// First copy the game instance
-		Connect4Game stateCopy = new Connect4Game(state.getPlayerNum(), state.getPlayers(), state.getBoard(), evaluate(state), movesDone(state));
+		Connect4Game stateCopy = new Connect4Game(state.getPlayerNum(), state.getPlayers(), state.getBoard(), evaluateBoard(state), movesDone(state));
 
 		// pick the move
 		// start alpha-beta with neg and pos infinities
@@ -47,34 +49,26 @@ public class ComputerConnect4Player extends Player {
 	 */
 	private  Connect4Move pickMove(Connect4Game state, int depth, int low, int high, Connect4View view){
 		Connect4Move[] movesArray; // order of moves
-
 		// grab the available moves, sorted by value
 		movesArray = checkMoves(state);
-
 		// dummy move that will be replaced with evaluation
 		Connect4Move bestMove = new Connect4Move(-Integer.MAX_VALUE, movesArray[0].move);
-
-
 		// Use alpha-beta pruning to pick the move
 		for (int i = 0; i < 7 && bestMove.value < high; i++){
 			// grab the move from list
 			int column = movesArray[i].move;
-
 			if (state.isValidMove(column)){
 				Connect4Move currentMove;
-
 				// grab value of current position to restore later
 				int evalValue = state.grabEvalValue();
 
 				state.makeMove(column);
-
-//				 testing
 								if (canPrint){
 									System.out.println("===============");
-									System.out.println("Position Eval # :" + evaluate(state));
+									System.out.println("Position Eval # :" + evaluateBoard(state));
 									System.out.println("===============");
 								}
-				
+
 				if (state.gameIsOver()){
 					// Is game over because board is full?
 					if (state.isFull()){
@@ -82,36 +76,28 @@ public class ComputerConnect4Player extends Player {
 					}
 
 					// if it's comp's turn, then this must be a win scenario
-					currentMove = new Connect4Move(HOW_GOOD[4], column);
-
+					currentMove = new Connect4Move(WEIGTH_OF_WINNING, column);
 				}
 				// keep going if depth available
 				else if (depth >= 1){
-
 					// Switch player perspective
 					// Reduce depth by 1
 					currentMove = pickMove(state, depth - 1, -high, -low, view);
-
 					// transfer values back while changing perspective
 					currentMove.value = (currentMove.value * -1);
 					currentMove.move = column;
-
 				} else {
 					currentMove = new Connect4Move(state.grabEvalValue(), column);
 				}
-
 				// Is the current move better than what we've found so far?
 				if (currentMove.value > bestMove.value){
 					bestMove = currentMove; // replace
 					low = Math.max(bestMove.value, low); // update the achievable lower bound value
 				}
-
 				// undo move before trying next move
 				state.undoMove(column, evalValue);
 			}
-
 		}
-
 		return bestMove;
 	}
 
@@ -182,131 +168,116 @@ public class ComputerConnect4Player extends Player {
 		return counter;
 	}
 
-	/**
-	 * Evaluate position by finding unblocked 4 in a rows
-	 *
-	 * @param state the input state of the board
-	 * @return a total int evaluation of unblocked four-in-rows for opp and computer
-	 */
-	public static int evaluate(Connect4State state){
-		// grab the checker pieces and board
-		char opponent = Connect4State.CHECKERS[1 - state.getPlayerNum()];
-		char player = Connect4State.CHECKERS[state.getPlayerNum()];
 
-		char[][] board = state.getBoard();
+		/**
+		 * Evalueates the current board
+		 *
+		 * @return a new evaluation value
+		 */
+		public static int evaluateBoard(Connect4State state){
+			// grab the players
+			char opponent = Connect4State.CHECKERS[(1 - state.getPlayerNum())];
+			char mainPlayer = Connect4State.CHECKERS[state.getPlayerNum()];
 
-		// value that evaluates the unblocked four-in-rows
-		int totalEvaluation = 0;
+			int horizValue=0;
+			int vertValue=0;
+			int diagPValue=0;
+			int diagNValue=0;
 
-		// Evaluate patterns for winning
-		//
-		//   . X X . .   => unblocked on both sides so we can connect 4
-		//  by placing another piece to become
-		//  . X X X .
-		for (int checkColumn = 0; checkColumn < 3; checkColumn ++){
-			// if 0 is empty, followed by 2 of my pieces and two more empty, this is a pattern
-			if (board[0][checkColumn] == Connect4State.EMPTY &&
-					board[0][checkColumn + 1] == player &&
-					board[0][checkColumn + 2] == player &&
-					board[0][checkColumn + 3] == Connect4State.EMPTY &&
-					board[0][checkColumn + 4] == Connect4State.EMPTY){
-				totalEvaluation += HOW_GOOD[3];
-			} else if (board[0][checkColumn] == Connect4State.EMPTY &&
-					board[0][checkColumn + 1] == Connect4State.EMPTY &&
-					board[0][checkColumn + 2] == player &&
-					board[0][checkColumn + 3] == player &&
-					board[0][checkColumn + 4] == Connect4State.EMPTY){
-				totalEvaluation += HOW_GOOD[3];
+			for(int i=0;i<Connect4State.ROWS-3;i++){
+				for(int j=0;j<Connect4State.COLS;j++){
+					vertValue += checkPos(state, mainPlayer, opponent, i, i+3, j, j, false);
+				}
 			}
+			for(int i=0;i<Connect4State.ROWS;i++){
+				for(int j=0;j<Connect4State.COLS-3;j++){
+					horizValue += checkPos(state, mainPlayer, opponent, i, i, j, j+3, false);
+				}
+			}
+
+			for(int i=0;i<Connect4State.ROWS-3;i++){
+				for(int j=0;j<Connect4State.COLS-3;j++){
+					diagPValue += checkPos(state, mainPlayer, opponent, i, i+3, j, j+3, false);
+					diagNValue += checkPos(state, mainPlayer, opponent, i+3, i, j, j+3, true);
+				}
+			}
+			// now return the total value of horizontal, vertical and diagonals
+			int sum = horizValue + horizValue + diagPValue + diagNValue;
+
+			return sum;
+		}
+
+		/**
+		 * Evaluates the possibilities for diagonal and horizontal connect fours
+		 *
+		 * @param mainPlayer the main player
+		 * @param opponent the other player
+		 * @param i1 column left bound
+		 * @param i2 column right bound
+		 * @param j1 row left bound
+		 * @param j2 row right bound
+		 * @param horizMode horizontal mode switch
+		 * @return the weigth value for these pieces
+		 */
+		private static int checkPos(Connect4State state, char mainPlayer, char opponent, int i1, int i2, int j1, int j2, boolean horizMode){
+			int opponentCount = 0;
+			int playerCount = 0;
+			char[][] board= state.getBoard();
+			if(horizMode){
+				for(int i=i1;i>=i2;i--){
+					for(int j=j1;j<=j2;j++){
+						if (board[i][j] == opponent){
+							opponentCount++;
+						} else if (board[i][j] == mainPlayer){
+							playerCount++;
+						}
+					}
+				}
+			}
+			else{
+				for(int i=i1;i<=i2;i++){
+					for(int j=j1;j<=j2;j++){
+						if (board[i][j] == opponent){
+							opponentCount++;
+						} else if (board[i][j] == mainPlayer){
+							playerCount++;
+						}
+					}
+				}
+			}
+			return applyWeights(playerCount, opponentCount);
 		}
 
 
-		// Evaluate unblocked verticals
-		// all potential ver 4-in-row start from at most from row 2
-		for (int column = 0; column < Connect4Game.COLS; column++){
-			for (int row = 0; row < 3; row++){
-				int compCount = 0;
-				int oppCount = 0;
 
-				for (int checkRow = row; checkRow < row + 4; checkRow++){
-					if (board[checkRow][column] == player){
-						compCount++;
-					} else if (board[checkRow][column] == opponent){
-						oppCount++;
+			/**
+			 * Public helper method to apply weights after looking at Connect 4
+			 * possibilities
+			 *
+			 * @param playerCount the number of pieces player has in the connect 4 line
+			 * @param opponentCount the number of pieces opponent has in the connect 4 line
+			 * @param sum the weighted sum so far
+			 * @return the new sum after applying the weights.
+			 */
+			public static int applyWeights(int playerCount, int opponentCount){
+				// apply the weights based on the previous connect 4 possibilities
+				int sum=0;
+
+				if(hChoice){
+					if (playerCount == 0 && opponentCount == 3){
+						sum += -WEIGTH_OF_THREAT;
+					} else if (opponentCount == 0 && playerCount ==3) {
+						sum += WEIGTH_OF_WINNING;
 					}
 				}
 
-				totalEvaluation = Connect4Game.applyWeights(oppCount, compCount, totalEvaluation);
-			}
-		}
-
-		// Evaluate unblocked horizontals
-		// all potential hor 4-in-row start from at most from halfway col
-		for (int column = 0; column <= 3; column++){
-			for(int row = 0; row < Connect4Game.ROWS; row++){
-				// counters for computer and opponent
-				int compCount = 0;
-				int oppCount = 0;
-
-				for (int checkColumn = column; checkColumn < column + 4; checkColumn++){
-					// check whose checker it is and increment their counter
-					if (board[row][checkColumn] == player){
-						compCount++;
-					} else if (board[row][checkColumn] == opponent){
-						oppCount++;
-					}
+				if (playerCount == 0){
+					sum += -1;
+				} else if (opponentCount == 0) {
+					sum += 1;
 				}
-
-				totalEvaluation = Connect4Game.applyWeights(oppCount, compCount, totalEvaluation);
+				return sum;
 			}
-		}
-
-		// Evaluate unblocked diagonals (up to right)
-		// up to right diagonal start at most from row 2, column 3
-		for (int column = 0; column < 4; column++){
-			for (int row = 0; row < 3; row++){
-				int compCount = 0;
-				int oppCount = 0;
-
-				int checkRow = row; // need a checkrow parameter for diag
-				for (int checkColumn = column; checkRow < row + 4; checkColumn++){
-					if (board[checkRow][checkColumn] == player){
-						compCount++;
-					} else if (board[checkRow][checkColumn] == opponent){
-						oppCount++;
-					}
-
-					checkRow++; // adjust for diagonal
-				}
 
 
-				totalEvaluation = Connect4Game.applyWeights(oppCount, compCount, totalEvaluation);
-			}
-		}
-
-		// Evaluate unblocked diagonals (down to right)
-		// down to right diagonal start at most from row 3, column 3
-		for (int column = 0; column < 4; column++){
-			for (int row = 3; row <= 5; row++){
-				int compCount = 0;
-				int oppCount = 0;
-
-				int checkRow = row; // need a checkrow parameter for diag
-				for (int checkColumn = column; checkColumn < column + 4; checkColumn++){
-					if (board[checkRow][checkColumn] == player){
-						compCount++;
-					} else if (board[checkRow][checkColumn] == opponent){
-						oppCount++;
-					}
-
-					checkRow--; // adjust for diagonal
-				}
-
-				totalEvaluation = Connect4Game.applyWeights(oppCount, compCount, totalEvaluation);
-			}
-		}
-
-		return totalEvaluation;
-
-	}
 }

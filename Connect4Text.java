@@ -21,9 +21,9 @@ public class Connect4Text implements Connect4View{
 	public void display(Connect4State state){
 		char [][] board = state.getBoard();
 
-		for (int row = state.ROWS - 1; row > -1; row--){
+		for (int row = Connect4State.ROWS - 1; row > -1; row--){
 			System.out.print(row + " |");
-			for (int column = 0; column < state.COLS; column++){
+			for (int column = 0; column < Connect4State.COLS; column++){
 				System.out.print(board[row][column]);
 				System.out.print(" ");
 			}
@@ -31,7 +31,7 @@ public class Connect4Text implements Connect4View{
 		}
 
 		System.out.print("  ");
-		for (int column = 0; column < state.COLS; column++){
+		for (int column = 0; column < Connect4State.COLS; column++){
 			System.out.print(" "+column);
 		}
 
@@ -67,10 +67,7 @@ public class Connect4Text implements Connect4View{
 					System.out.println("This move is not valid, please make a valid move.");
 					continue;
 				}
-				//TODO Burada bir sütünün tam dolu olup olmadığının kontrolünü yapmamaktayız
-				//bunun için if (choose in avaible collumns) dememiz gerek
-				//avaible columns ise şuan müsait olan sütünlar
-		    if( (choose < 0) || (choose > state.COLS - 1) ) {
+		    if( (choose < 0) || (choose > Connect4State.COLS - 1) ) {
 						System.out.println("Illegal column. Please try again");
 						System.out.println("Please pick a column");
 		        continue;
