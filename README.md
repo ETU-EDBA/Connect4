@@ -1,1 +1,5 @@
-# Connect4
+Compile and run steps:
+
+Execute this command:
+
+"./compile.sh"
