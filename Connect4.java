@@ -11,6 +11,18 @@ import java.lang.*;
  */
 
 public class Connect4 {
+
+
+
+	public static long averageTime(ArrayList<Result> arr){
+		long sum = 0;
+		for (int i = 0 ; i < arr.size(); i++){
+			sum += arr.get(i).Time;
+		}
+		return sum/arr.size();
+	}
+
+
 	public static void main(String [] args){
 		Scanner input = new Scanner(System.in);
 		String answer = "";
@@ -141,9 +153,44 @@ public class Connect4 {
 				}
 			}
 
-			System.out.println("H1 : " + result_H1.toString() );
+			//System.out.println("H1 : " + result_H1.toString() );
+			long average1 = averageTime(result_H1);
 
-			System.out.println("H2 : " + result_H2.toString() );
+			int numberOfWins1 = 0;
+			int numberOfFail1 = 0;
+			int numberOfTie1 = 0;
+
+			for (int i = 0 ; i < result_H1.size(); i++){
+				if (result_H1.get(i).Winner.equals("Computer1")){
+					numberOfWins1++;
+				}else if (result_H1.get(i).Winner.equals("Tie")){
+					numberOfTie1++;
+				}else{
+					numberOfFail1++;
+				}
+			}
+
+			System.out.println(result_H1.size() + " oyun icerisinde " + "H1 kullanilarak, " + numberOfWins1 + " galibiyet, " + numberOfTie1 + " beraberlik, " + numberOfFail1 +" malubiyet alinmistir." + " Oyunlar ortalama " + average1 + "ms surmustur." );
+
+
+
+			//System.out.println("H2 : " + result_H2.toString() );
+			long average2 = averageTime(result_H2);
+			int numberOfWins2 = 0;
+			int numberOfFail2 = 0;
+			int numberOfTie2 = 0;
+
+			for (int i = 0 ; i < result_H2.size(); i++){
+				if (result_H2.get(i).Winner.equals("Computer1")){
+					numberOfWins2++;
+				}else if (result_H2.get(i).Winner.equals("Tie")){
+					numberOfTie2++;
+				}else{
+					numberOfFail2++;
+				}
+			}
+
+			System.out.println(result_H2.size() + " oyun icerisinde " + "H2 kullanilarak, " + numberOfWins2 + " galibiyet, " + numberOfTie2 + " beraberlik, " + numberOfFail2 +" malubiyet alinmistir." + " Oyunlar ortalama " + average2 + "ms surmustur."  );
 
 
 
