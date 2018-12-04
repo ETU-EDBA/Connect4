@@ -35,8 +35,10 @@ public class Connect4 {
 			if (playerName.contains("Computer")){
 				int askDepth = view.getIntAnswer("Bilgisayar sezgi derinligini giriniz");
 				players[0] = new ComputerConnect4Player(playerName, askDepth);
+				players[0].canPrint = true;
 			} else {
 				players[0] = new Connect4HumanPlayer(playerName);
+				players[0].canPrint = true;
 			}
 
 			playerName = view.getAnswer("Ikinci oyuncunun adini giriniz." +
@@ -45,12 +47,13 @@ public class Connect4 {
 			if (playerName.contains("Computer")){
 				int askDepth = view.getIntAnswer("Bilgisayar sezgi derinligini giriniz");
 				players[1] = new ComputerConnect4Player(playerName, askDepth);
+				players[1].canPrint = true;
 			} else {
 				players[1] = new Connect4HumanPlayer(playerName);
+				players[1].canPrint = true;
 			}
 
 			Connect4Game state = new Connect4Game(0, players);
-
 			view.display(state);
 
 			// Hold current game state
@@ -58,6 +61,7 @@ public class Connect4 {
 				int move = state.getPlayerToMove().getMove(state, view);
 
 				state.makeMove(move);
+
 				view.display(state);
 			}
 
@@ -105,14 +109,15 @@ public class Connect4 {
 
 					Connect4Game state = new Connect4Game(0, players);
 
-					view.display(state);
+				//	view.display(state);
 
 					// Hold current game state
 					while (!state.gameIsOver()){
 						int move = state.getPlayerToMove().getMove(state, view);
 
 						state.makeMove(move);
-						view.display(state);
+
+						//view.display(state);
 					}
 
 					// The game is over
@@ -132,6 +137,7 @@ public class Connect4 {
 
 			System.out.println("H2 : " + result_H2.toString() );
 
+			
 
 		}
 

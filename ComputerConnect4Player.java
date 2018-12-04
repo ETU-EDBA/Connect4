@@ -7,7 +7,7 @@ public class ComputerConnect4Player extends Player {
 
 	// the closer a piece is to the center, the more 4-in-row permutations available.
 	// i.e.., generally center piece is most valuable
-	private static final int[] movesByCol = { 3, 4, 2, 5, 1, 6, 0 }; 
+	private static final int[] movesByCol = { 3, 4, 2, 5, 1, 6, 0 };
 
 	/**
 	 * Create a computer player with a given name
@@ -28,31 +28,31 @@ public class ComputerConnect4Player extends Player {
 		Connect4Move chosenMoveObj = pickMove(stateCopy, depth, -Integer.MAX_VALUE, Integer.MAX_VALUE, view);
 		int chosenMove = chosenMoveObj.move;
 
-		view.reportMove(chosenMove, state.getPlayerToMove().getName());
+		//view.reportMove(chosenMove, state.getPlayerToMove().getName());
 
 		return chosenMove;
-	} 
+	}
 
 	/**
-	 * Uses game tree search with alpha-beta pruning to pick player's move 
+	 * Uses game tree search with alpha-beta pruning to pick player's move
 	 * low and high define the current range for the best move
-	 * 
+	 *
 	 * @param state the current state of the game
 	 * @param depth the number of moves to look ahead in game tree search
 	 * @param low a value that the player can achieve by some other move
 	 * @param high a value that the opponent can force by a different line of play
 	 * @param view view for testing purposes
-	 * 
+	 *
 	 * @return the move chosen
 	 */
-	private static Connect4Move pickMove(Connect4Game state, int depth, int low, int high, Connect4View view){
+	private  Connect4Move pickMove(Connect4Game state, int depth, int low, int high, Connect4View view){
 		Connect4Move[] movesArray; // order of moves
 
 		// grab the available moves, sorted by value
 		movesArray = checkMoves(state);
 
 		// dummy move that will be replaced with evaluation
-		Connect4Move bestMove = new Connect4Move(-Integer.MAX_VALUE, -10); 
+		Connect4Move bestMove = new Connect4Move(-Integer.MAX_VALUE, -10);
 
 
 		// Use alpha-beta pruning to pick the move
@@ -69,22 +69,24 @@ public class ComputerConnect4Player extends Player {
 				state.makeMove(column);
 
 //				 testing
-								view.display(state);
-								System.out.println("===============");
-								System.out.println("Position Eval # :" + evaluate(state));
-								System.out.println("===============");
+								if (canPrint){
+									view.display(state);
+									System.out.println("===============");
+									System.out.println("Position Eval # :" + evaluate(state));
+									System.out.println("===============");
+								}
 
 
 				if (state.gameIsOver()){
 					// Is game over because board is full?
 					if (state.isFull()){
 						currentMove = new Connect4Move(0, column); // assign value of 0
-					} 
+					}
 
 					// if it's comp's turn, then this must be a win scenario
 					currentMove = new Connect4Move(HOW_GOOD[4], column);
 
-				} 
+				}
 				// keep going if depth available
 				else if (depth >= 1){
 
@@ -96,7 +98,7 @@ public class ComputerConnect4Player extends Player {
 					currentMove.value = (currentMove.value * -1);
 					currentMove.move = column;
 
-				} else { 
+				} else {
 					currentMove = new Connect4Move(state.grabEvalValue(), column);
 				}
 
@@ -119,7 +121,7 @@ public class ComputerConnect4Player extends Player {
 	/**
 	 * Check the move list for their associated values
 	 * Then sort them by value
-	 * 
+	 *
 	 * @param state the current state of the game
 	 * @return an array of moves sorted by their values
 	 */
@@ -143,12 +145,12 @@ public class ComputerConnect4Player extends Player {
 
 				// undo the state before checking again
 				state.undoMove(theMove, stateEval);
-			} 
+			}
 		}
 
 		// sort the move lists by values
 		for (int i = 1; i < Connect4Game.COLS; i++){
-			for (int compare = i; (compare >=1 && movesArray[compare].value > 
+			for (int compare = i; (compare >=1 && movesArray[compare].value >
 			movesArray[compare - 1].value);
 					compare--){
 				// placeholder to prevent clobbering
@@ -165,7 +167,7 @@ public class ComputerConnect4Player extends Player {
 
 	/**
 	 * Helper method that counts the moves made
-	 * 
+	 *
 	 * @param state the input state of the board
 	 * @return the number of moves already made
 	 */
@@ -184,7 +186,7 @@ public class ComputerConnect4Player extends Player {
 
 	/**
 	 * Evaluate position by finding unblocked 4 in a rows
-	 * 
+	 *
 	 * @param state the input state of the board
 	 * @return a total int evaluation of unblocked four-in-rows for opp and computer
 	 */
@@ -199,16 +201,16 @@ public class ComputerConnect4Player extends Player {
 		int totalEvaluation = 0;
 
 		// Evaluate patterns for winning
-		//  
+		//
 		//   . X X . .   => unblocked on both sides so we can connect 4
 		//  by placing another piece to become
 		//  . X X X .
 		for (int checkColumn = 0; checkColumn < 3; checkColumn ++){
 			// if 0 is empty, followed by 2 of my pieces and two more empty, this is a pattern
 			if (board[0][checkColumn] == Connect4State.EMPTY &&
-					board[0][checkColumn + 1] == player && 
+					board[0][checkColumn + 1] == player &&
 					board[0][checkColumn + 2] == player &&
-					board[0][checkColumn + 3] == Connect4State.EMPTY && 
+					board[0][checkColumn + 3] == Connect4State.EMPTY &&
 					board[0][checkColumn + 4] == Connect4State.EMPTY){
 				totalEvaluation += HOW_GOOD[3];
 			} else if (board[0][checkColumn] == Connect4State.EMPTY &&

@@ -5,21 +5,22 @@
 
 public abstract class Player {
 	private String playerName;
-	
+	public boolean canPrint = false;
+
 	/**
 	 * @param name player's name
 	 */
 	public Player (String name) {
 		playerName = name;
 	}
-	
-	/** 
+
+	/**
 	 * @return the player's name
 	 */
 	public String getName() {
 		return playerName;
 	}
-	
+
 	/**
 	 * Gets and returns the player's choice of move
 	 * @param state current game state

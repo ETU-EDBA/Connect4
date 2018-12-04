@@ -1,4 +1,4 @@
-/** 
+/**
  * View for Connect 4 game (in model-view-controller pattern)
  * Displays the game and interacts with the user
  * @author Scot Drysdale
@@ -6,7 +6,7 @@
 
 public interface Connect4View {
 
-	/**  
+	/**
 	 * Displays the current board
 	 * @param state current state of the game
 	 */

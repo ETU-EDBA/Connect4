@@ -65,7 +65,7 @@ public class Connect4Text implements Connect4View{
 		    choose = column.nextInt();
 				//TODO Burada bir sütünün tam dolu olup olmadığının kontrolünü yapmamaktayız
 				//bunun için if (choose in avaible collumns) dememiz gerek
-				//avaible columns ise şuan müsait olan sütünlar  
+				//avaible columns ise şuan müsait olan sütünlar
 		    if( (choose < 0) || (choose > state.COLS - 1) ) {
 						System.out.println("Illegal column. Please try again");
 						System.out.println("Please pick a column");
