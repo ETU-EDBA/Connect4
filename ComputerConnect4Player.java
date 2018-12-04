@@ -70,13 +70,11 @@ public class ComputerConnect4Player extends Player {
 
 //				 testing
 								if (canPrint){
-									view.display(state);
 									System.out.println("===============");
 									System.out.println("Position Eval # :" + evaluate(state));
 									System.out.println("===============");
 								}
-
-
+				
 				if (state.gameIsOver()){
 					// Is game over because board is full?
 					if (state.isFull()){

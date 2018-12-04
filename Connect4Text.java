@@ -63,6 +63,10 @@ public class Connect4Text implements Connect4View{
 		        continue;
 		    }
 		    choose = column.nextInt();
+				if(!state.isValidMove(choose)){
+					System.out.println("This move is not valid, please make a valid move.");
+					continue;
+				}
 				//TODO Burada bir sütünün tam dolu olup olmadığının kontrolünü yapmamaktayız
 				//bunun için if (choose in avaible collumns) dememiz gerek
 				//avaible columns ise şuan müsait olan sütünlar

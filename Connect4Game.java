@@ -346,8 +346,7 @@ public class Connect4Game implements Connect4State{
 
 		// ++ for row and column for diagonals
 		// ++ for column for horizontals
-		for (checkColumn = checkColumn;
-				checkColumn <= leftBound + 3;
+		for (;checkColumn <= leftBound + 3;
 				checkRow += offsetRow) {
 
 			// check whose pieces belong to whom
@@ -365,8 +364,7 @@ public class Connect4Game implements Connect4State{
 
 		// ++ for row and column for diagonals
 		// ++ for column for horizontals
-		for (checkColumn = checkColumn;
-				checkColumn <= rightBound;
+		for (;checkColumn <= rightBound;
 				checkRow += offsetRow){
 			if (board[(checkRow - diagonalDelta)][(checkColumn - 4)] == opponent){
 				opponentCount = opponentCount -1;

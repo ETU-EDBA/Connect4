@@ -30,7 +30,7 @@ public class Connect4 {
 
 		// Ask for either text or view
 		while (!(answer.contains("Demo") || answer.contains("Istatistik"))){
-			System.out.println("Demo / Istatistik Seciniz");
+			System.out.println("Demo / Istatistik Seciniz: ");
 			answer = input.nextLine();
 		}
 
@@ -41,25 +41,25 @@ public class Connect4 {
 			// Initialize the game
 			// Computer - for computer
 
-			String playerName = view.getAnswer("Ilk oyuncunun adini giriniz" +
-					"\n Bilgisayar ise computer yazabilirsiniz.");
+			String playerName = view.getAnswer("Ilk oyuncunun adini giriniz:" +
+					"\n(Bilgisayar ise computer yazabilirsiniz)");
 
 			if (playerName.contains("Computer")){
 				int askDepth = view.getIntAnswer("Bilgisayar sezgi derinligini giriniz");
 				players[0] = new ComputerConnect4Player(playerName, askDepth);
-				players[0].canPrint = true;
+				players[0].canPrint = false;
 			} else {
 				players[0] = new Connect4HumanPlayer(playerName);
 				players[0].canPrint = true;
 			}
 
 			playerName = view.getAnswer("Ikinci oyuncunun adini giriniz." +
-					"\n Bilgisayar ise computer yazabilirsiniz. ");
+					"\nBilgisayar ise computer yazabilirsiniz: ");
 
 			if (playerName.contains("Computer")){
 				int askDepth = view.getIntAnswer("Bilgisayar sezgi derinligini giriniz");
 				players[1] = new ComputerConnect4Player(playerName, askDepth);
-				players[1].canPrint = true;
+				players[1].canPrint = false;
 			} else {
 				players[1] = new Connect4HumanPlayer(playerName);
 				players[1].canPrint = true;
@@ -172,6 +172,7 @@ public class Connect4 {
 
 			System.out.println(result_H1.size() + " oyun icerisinde " + "H1 kullanilarak, " + numberOfWins1 + " galibiyet, " + numberOfTie1 + " beraberlik, " + numberOfFail1 +" malubiyet alinmistir." + " Oyunlar ortalama " + average1 + "ms surmustur." );
 
+			
 
 
 			//System.out.println("H2 : " + result_H2.toString() );
