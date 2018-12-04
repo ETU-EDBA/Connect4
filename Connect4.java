@@ -201,12 +201,13 @@ public class Connect4 {
 			}
 
 
-			System.out.println(result_H1.size() + " oyun oynandı. Bu oyunlar içerisinde H2 kullanilarak YZ1: " + numberOfWins1 + " adet galibiyet, "
-			 + numberOfTies1 + " adet beraberlik ve "
+			System.out.println(result_H1.size() + " oyun oynandi. \nBu oyunlar icerisinde H2 kullanilarak YZ1: \n " + numberOfWins1 + "  adet galibiyet \n "
+			 + numberOfTies1 + " adet beraberlik \n "
 			  + numberOfLoses1 +" adet malubiyet alinmistir.\n"
 			 + "Oyunlar ortalama " + average1 + "ms surmustur.\n"
-			 + "Kullanılan data set üzerinde doğru tahmin oranı = % "+((1.0*numberOfSuccess1/(numberOfSuccess1+numberOfFails1))*100) );
+			 + "Kullanilan data set uzerinde dogru tahmin orani = % "+((1.0*numberOfSuccess1/(numberOfSuccess1+numberOfFails1))*100) );
 
+			 System.out.println("-----------------------------------------------------------------------");
 
 
 
@@ -238,11 +239,11 @@ public class Connect4 {
 				}
 			}
 
-			System.out.println(result_H2.size() + " oyun oynandı. Bu oyunlar içerisinde H2 kullanilarak YZ2:" + numberOfWins2 + " adet galibiyet, "
-			 + numberOfTies2 + " adet beraberlik ve "
+			System.out.println(result_H2.size() + " oyun oynandi.\n Bu oyunlar icerisinde H2 kullanilarak YZ2:  \n" + numberOfWins2 + "  adet galibiyet \n "
+			 + numberOfTies2 + " adet beraberlik \n "
 			  + numberOfLoses2 +" adet malubiyet alinmistir.\n"
 			 + "Oyunlar ortalama " + average2 + "ms surmustur.\n"
-			 + "Kullanılan data set üzerinde doğru tahmin oranı = % "+((0.1*numberOfSuccess2/(numberOfSuccess2+numberOfFails2))*100) );
+			 + "Kullanilan data set uzerinde dogru tahmin orani = % "+((0.1*numberOfSuccess2/(numberOfSuccess2+numberOfFails2))*100) );
 
 
 
