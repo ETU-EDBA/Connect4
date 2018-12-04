@@ -52,7 +52,7 @@ public class ComputerConnect4Player extends Player {
 		movesArray = checkMoves(state);
 
 		// dummy move that will be replaced with evaluation
-		Connect4Move bestMove = new Connect4Move(-Integer.MAX_VALUE, -10);
+		Connect4Move bestMove = new Connect4Move(-Integer.MAX_VALUE, movesArray[0].move);
 
 
 		// Use alpha-beta pruning to pick the move

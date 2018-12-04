@@ -125,10 +125,18 @@ public class Connect4 {
 					//view.reportToUser(state.getPlayers()[1 - state.getPlayerNum()].getName() + " won!");
 					long finish = System.currentTimeMillis();
 					long timeElapsed = finish - start;
+					Result tmpResult=new Result();
+					if (state.isFull()){
+							tmpResult.Winner="Tie";
+					}
+					else{
+						tmpResult.Winner=state.getPlayers()[1 - state.getPlayerNum()].getName();
+					}
+					tmpResult.Time=timeElapsed;
 					if (i == 0){
-							result_H1.add(new Result(state.getPlayers()[1 - state.getPlayerNum()].getName() , timeElapsed));
+							result_H1.add(tmpResult);
 					}else if (i == 1){
-							result_H2.add(new Result(state.getPlayers()[1 - state.getPlayerNum()].getName() , timeElapsed));
+							result_H2.add(tmpResult);
 					}
 				}
 			}
@@ -137,7 +145,7 @@ public class Connect4 {
 
 			System.out.println("H2 : " + result_H2.toString() );
 
-			
+
 
 		}
 
