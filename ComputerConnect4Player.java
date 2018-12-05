@@ -9,7 +9,7 @@ public class ComputerConnect4Player extends Player {
 	// i.e.., generally center piece is most valuable
 	private static final int[] movesByCol = { 3, 4, 2, 5, 1, 6, 0 };
 	private static final int WEIGTH_OF_THREAT = 10^3;
-	private static final int WEIGTH_OF_WINNING = 10^8;
+	private static final int WEIGTH_OF_WINNING = 10^5;
 
 	/**
 	 * Create a computer player with a given name
@@ -63,11 +63,11 @@ public class ComputerConnect4Player extends Player {
 				int evalValue = state.grabEvalValue();
 
 				state.makeMove(column);
-								if (canPrint){
-									System.out.println("===============");
-									System.out.println("Position Eval # :" + evaluateBoard(state));
-									System.out.println("===============");
-								}
+				if (canPrint){
+					System.out.println("===============");
+					System.out.println("Position Eval # :" + evaluateBoard(state));
+					System.out.println("===============");
+				}
 
 				if (state.gameIsOver()){
 					// Is game over because board is full?
@@ -189,12 +189,12 @@ public class ComputerConnect4Player extends Player {
 					vertValue += checkPos(state, mainPlayer, opponent, i, i+3, j, j, false);
 				}
 			}
+
 			for(int i=0;i<Connect4State.ROWS;i++){
 				for(int j=0;j<Connect4State.COLS-3;j++){
 					horizValue += checkPos(state, mainPlayer, opponent, i, i, j, j+3, false);
 				}
 			}
-
 			for(int i=0;i<Connect4State.ROWS-3;i++){
 				for(int j=0;j<Connect4State.COLS-3;j++){
 					diagPValue += checkPos(state, mainPlayer, opponent, i, i+3, j, j+3, false);
@@ -202,7 +202,7 @@ public class ComputerConnect4Player extends Player {
 				}
 			}
 			// now return the total value of horizontal, vertical and diagonals
-			int sum = horizValue + horizValue + diagPValue + diagNValue;
+			int sum = horizValue + vertValue + diagPValue + diagNValue;
 
 			return sum;
 		}
@@ -210,6 +210,7 @@ public class ComputerConnect4Player extends Player {
 		/**
 		 * Evaluates the possibilities for diagonal and horizontal connect fours
 		 *
+		 * @param state state
 		 * @param mainPlayer the main player
 		 * @param opponent the other player
 		 * @param i1 column left bound
@@ -223,26 +224,28 @@ public class ComputerConnect4Player extends Player {
 			int opponentCount = 0;
 			int playerCount = 0;
 			char[][] board= state.getBoard();
-			if(horizMode){
-				for(int i=i1;i>=i2;i--){
-					for(int j=j1;j<=j2;j++){
-						if (board[i][j] == opponent){
-							opponentCount++;
-						} else if (board[i][j] == mainPlayer){
-							playerCount++;
-						}
+			if(horizMode==true){
+				int j=j1;
+				for(int i=i1;i>=i2 && j<=j2; i--, j++){
+
+					if (board[i][j] == opponent){
+						opponentCount++;
+					} else if (board[i][j] == mainPlayer){
+						playerCount++;
 					}
+
 				}
 			}
 			else{
-				for(int i=i1;i<=i2;i++){
-					for(int j=j1;j<=j2;j++){
-						if (board[i][j] == opponent){
-							opponentCount++;
-						} else if (board[i][j] == mainPlayer){
-							playerCount++;
-						}
+				int j=j1;
+				for(int i=i1;i<=i2 && j<=j2; i++,j++){
+
+					if (board[i][j] == opponent){
+						opponentCount++;
+					} else if (board[i][j] == mainPlayer){
+						playerCount++;
 					}
+
 				}
 			}
 			return applyWeights(playerCount, opponentCount);
@@ -265,16 +268,15 @@ public class ComputerConnect4Player extends Player {
 
 				if(hChoice){
 					if (playerCount == 0 && opponentCount == 3){
-						sum += -WEIGTH_OF_THREAT;
-					} else if (opponentCount == 0 && playerCount ==3) {
+						sum += WEIGTH_OF_THREAT;
+					}
+					else if (opponentCount == 0 && playerCount ==3) {
 						sum += WEIGTH_OF_WINNING;
 					}
 				}
 
-				if (playerCount == 0){
-					sum += -1;
-				} else if (opponentCount == 0) {
-					sum += 1;
+				if (opponentCount == 0) {
+					sum ++;
 				}
 				return sum;
 			}

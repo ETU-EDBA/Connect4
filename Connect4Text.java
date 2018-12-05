@@ -25,14 +25,14 @@ public class Connect4Text implements Connect4View{
 			System.out.print(row + " |");
 			for (int column = 0; column < Connect4State.COLS; column++){
 				System.out.print(board[row][column]);
-				System.out.print(" ");
+				System.out.print("  ");
 			}
 			System.out.println("\n");
 		}
 
-		System.out.print("  ");
+		System.out.print(" ");
 		for (int column = 0; column < Connect4State.COLS; column++){
-			System.out.print(" "+column);
+			System.out.print("  "+column);
 		}
 
 		System.out.println("\n");

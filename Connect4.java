@@ -37,7 +37,7 @@ public class Connect4 {
 			stream.forEach(string->{
 				String s[] = string.split(" ");
 				String steps=s[0];
-				String expected=s[1];
+				int expected=Integer.parseInt(s[1]);
 				Player [] tmpPlayers = new Player[2];
 				tmpPlayers[0] = new Connect4StatPlayer("", steps);
 				tmpPlayers[1]=tmpPlayers[0];
@@ -81,12 +81,10 @@ public class Connect4 {
 					tmpResult.Expected=expected;
 					if (i == 0){
 							result_H1.add(tmpResult);
-					}else if (i == 1){
+					}else {
 							result_H2.add(tmpResult);
 					}
 				}
-
-
 			});
 
 			list.add(result_H1);
@@ -106,22 +104,23 @@ public class Connect4 {
 		Connect4View view;
 
 		// Ask for either text or view
-		while (!(answer.contains("Demo") || answer.contains("Istatistik"))){
+		while (!(answer.toLowerCase().contains("demo") || answer.toLowerCase().contains("istatistik"))){
 			System.out.println("Demo / Istatistik Seciniz: ");
 			answer = input.nextLine();
 		}
 
-		if (answer.contains("Demo")){
-			view = new Connect4Text();
+		if (answer.toLowerCase().contains("demo")){
+			view = new Connect4ViewGraphical();
 			Player [] players = new Player[2];
 
 			// Initialize the game
 			// Computer - for computer
+			ComputerConnect4Player.hChoice=true;
 
 			String playerName = view.getAnswer("Ilk oyuncunun adini giriniz:" +
 					"\n(Bilgisayar ise computer yazabilirsiniz)");
 
-			if (playerName.contains("Computer")){
+			if (playerName.toLowerCase().contains("computer")){
 				int askDepth = view.getIntAnswer("Bilgisayar sezgi derinligini giriniz");
 				players[0] = new ComputerConnect4Player(playerName, askDepth);
 				players[0].canPrint = false;
@@ -133,7 +132,7 @@ public class Connect4 {
 			playerName = view.getAnswer("Ikinci oyuncunun adini giriniz." +
 					"\nBilgisayar ise computer yazabilirsiniz: ");
 
-			if (playerName.contains("Computer")){
+			if (playerName.toLowerCase().contains("computer")){
 				int askDepth = view.getIntAnswer("Bilgisayar sezgi derinligini giriniz");
 				players[1] = new ComputerConnect4Player(playerName, askDepth);
 				players[1].canPrint = false;
@@ -159,7 +158,7 @@ public class Connect4 {
 			view.reportToUser(state.getPlayers()[1 - state.getPlayerNum()].getName() + " won!");
 
 		}
-		else if (answer.contains("Istatistik")){
+		else if (answer.toLowerCase().contains("istatistik")){
 			view = new Connect4Text();
 			Scanner keyboard = new Scanner(System.in);
 
@@ -188,11 +187,11 @@ public class Connect4 {
 				}else{
 					numberOfLoses1++;
 				}
-				if(result_H1.get(i).Expected.equals("1") && result_H1.get(i).Winner.equals("Computer1")){
+				if(result_H1.get(i).Expected>0 && result_H1.get(i).Winner.equals("Computer1")){
 					numberOfSuccess1++;
-				}else if (result_H1.get(i).Expected.equals("0") && result_H1.get(i).Winner.equals("Tie")){
+				}else if (result_H1.get(i).Expected==0 && result_H1.get(i).Winner.equals("Tie")){
 					numberOfSuccess1++;
-				}else if(result_H1.get(i).Expected.equals("-1") && result_H1.get(i).Winner.equals("Computer2")){
+				}else if(result_H1.get(i).Expected<0 && result_H1.get(i).Winner.equals("Computer2")){
 					numberOfSuccess1++;
 				}
 				else{
@@ -201,7 +200,7 @@ public class Connect4 {
 			}
 
 
-			System.out.println(result_H1.size() + " oyun oynandi. \nBu oyunlar icerisinde H2 kullanilarak YZ1: \n " + numberOfWins1 + "  adet galibiyet \n "
+			System.out.println(result_H1.size() + " oyun oynandi. \nBu oyunlar icerisinde H1 kullanilarak YZ1: \n " + numberOfWins1 + "  adet galibiyet \n "
 			 + numberOfTies1 + " adet beraberlik \n "
 			  + numberOfLoses1 +" adet malubiyet alinmistir.\n"
 			 + "Oyunlar ortalama " + average1 + "ms surmustur.\n"
@@ -228,11 +227,11 @@ public class Connect4 {
 				}else{
 					numberOfLoses2++;
 				}
-				if(result_H2.get(i).Expected.equals("1") && result_H2.get(i).Winner.equals("Computer1")){
+				if(result_H2.get(i).Expected>0 && result_H2.get(i).Winner.equals("Computer1")){
 					numberOfSuccess2++;
-				}else if (result_H2.get(i).Expected.equals("0") && result_H2.get(i).Winner.equals("Tie")){
+				}else if (result_H2.get(i).Expected==0 && result_H2.get(i).Winner.equals("Tie")){
 					numberOfSuccess2++;
-				}else if(result_H2.get(i).Expected.equals("-1") && result_H2.get(i).Winner.equals("Computer2")){
+				}else if(result_H2.get(i).Expected<0 && result_H2.get(i).Winner.equals("Computer2")){
 					numberOfSuccess2++;
 				}else{
 					numberOfFails2++;
@@ -243,7 +242,7 @@ public class Connect4 {
 			 + numberOfTies2 + " adet beraberlik \n "
 			  + numberOfLoses2 +" adet malubiyet alinmistir.\n"
 			 + "Oyunlar ortalama " + average2 + "ms surmustur.\n"
-			 + "Kullanilan data set uzerinde dogru tahmin orani = % "+((0.1*numberOfSuccess2/(numberOfSuccess2+numberOfFails2))*100) );
+			 + "Kullanilan data set uzerinde dogru tahmin orani = % "+((1.0*numberOfSuccess2/(numberOfSuccess2+numberOfFails2))*100) );
 
 
 
