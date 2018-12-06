@@ -280,7 +280,7 @@ public class ComputerConnect4Player extends Player {
 			char[][] board= state.getBoard();
 			if(horizMode==true){
 				int j=j1;
-				for(int i=i1;i>=i2 && j<=j2; i--){
+				for(int i=i1;i>=i2; i--){
 
 					if (board[i][j] == opponent){
 						opponentCount++;
