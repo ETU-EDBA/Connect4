@@ -1,32 +1,26 @@
-/**
- * A player class to represent a Connect 4 player and its strategy.
- * @author Scot Drysdale
- */
-
 public abstract class Player {
 	private String playerName;
 	public boolean canPrint = false;
 
 	/**
-	 * @param name player's name
+	 * @param name Player ismi
 	 */
 	public Player (String name) {
 		playerName = name;
 	}
 
 	/**
-	 * @return the player's name
+	 * @return player ismi
 	 */
 	public String getName() {
 		return playerName;
 	}
 
 	/**
-	 * Gets and returns the player's choice of move
-	 * @param state current game state
-	 * @param view the object that displays the game
-	 * @return move chosen by the player, in the range
-	 *   0 to Connect4State-1
+	 * Kullanicidan hamle istenir.
+	 * @param state oyun durumu
+	 * @param view oyun view'i
+	 * @return yapilmasi istenilen hamle
 	 */
 	public abstract int getMove(Connect4State state, Connect4View view);
 }

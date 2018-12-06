@@ -1,19 +1,14 @@
 public class ComputerConnect4Player extends Player {
-	private int depth;  // depth to search at
-	public static boolean hChoice=false; //heuristic choice
+	private int depth;  // depth degeri
+	public static boolean hChoice=false; //heuristic secimi
 
-	// my weights
-	// need to be public/package for testing static evaluation func in Connect4Game.java
-
-	// the closer a piece is to the center, the more 4-in-row permutations available.
-	// i.e.., generally center piece is most valuable
 	private static final int[] movesByCol = { 3, 4, 2, 5, 1, 6, 0 };
 	private static final int WEIGTH_OF_THREAT = 1000;
 	private static final int WEIGTH_OF_WINNING = 100000;
 
 	/**
-	 * Create a computer player with a given name
-	 * @param name name of computer player
+	 * Verilmis isim ile bir computer player olusturulur.
+	 * @param name computer ismi
 	 */
 	public ComputerConnect4Player(String name, int depth){
 		super(name);
@@ -22,79 +17,68 @@ public class ComputerConnect4Player extends Player {
 
 	@Override
 	public int getMove(Connect4State state, Connect4View view) {
-		// First copy the game instance
+		// Game instance'dan yeni bir state kopyasi olustur.
 		Connect4Game stateCopy = new Connect4Game(state.getPlayerNum(), state.getPlayers(), state.getBoard(), evaluateBoard(state), movesDone(state));
 
-		// pick the move
-		// start alpha-beta with neg and pos infinities
+		// alpha-beta pruningli minimaxa negatif ve pozitif sonsuz sinirlarindan baslatir.
 		Connect4Move chosenMoveObj = pickMove(stateCopy, depth, -Integer.MAX_VALUE, Integer.MAX_VALUE, view);
 		int chosenMove = chosenMoveObj.move;
-
-		//view.reportMove(chosenMove, state.getPlayerToMove().getName());
 
 		return chosenMove;
 	}
 
 	/**
-	 * Uses game tree search with alpha-beta pruning to pick player's move
-	 * low and high define the current range for the best move
+	 * Game agacini alpha-beta pruningli minimax algoritmasi kullanarak arar ve secilmis olunan move'i doner.
 	 *
-	 * @param state the current state of the game
-	 * @param depth the number of moves to look ahead in game tree search
-	 * @param low a value that the player can achieve by some other move
-	 * @param high a value that the opponent can force by a different line of play
-	 * @param view view for testing purposes
+	 * @param state mevcut oyun state'i
+	 * @param depth agac derinligi
+	 * @param low minimax algoritmasi lower boundu
+	 * @param high minimax algoritmasi higher boundu
 	 *
-	 * @return the move chosen
+	 * @return secilmis move
 	 */
 	private  Connect4Move pickMove(Connect4Game state, int depth, int low, int high, Connect4View view){
-		Connect4Move[] movesArray; // order of moves
-		// grab the available moves, sorted by value
+		Connect4Move[] movesArray;
 		movesArray = checkMoves(state);
-		// dummy move that will be replaced with evaluation
 		Connect4Move bestMove = new Connect4Move(-Integer.MAX_VALUE, movesArray[0].move);
-		// Use alpha-beta pruning to pick the move
+		// Alpha beta pruningli minimax algoritmasi kullanilarak hamle secilir.
 		for (int i = 0; i < 7 && bestMove.value < high; i++){
-			// grab the move from list
+			// oncelikli move listesinden bir move secer.
 			int column = movesArray[i].move;
 			if (state.isValidMove(column)){
 				Connect4Move currentMove;
-				// grab value of current position to restore later
 				int evalValue = state.grabEvalValue();
 
 				state.makeMove(column);
 				if (canPrint){
-					System.out.println("===============");
 					System.out.println("Position Eval # :" + evaluateBoard(state));
-					System.out.println("===============");
 				}
 
 				if (state.gameIsOver()){
-					// Is game over because board is full?
+					// Oyun grid tamamen doldugu icin mi bitti?
 					if (state.isFull()){
-						currentMove = new Connect4Move(0, column); // assign value of 0
+						currentMove = new Connect4Move(0, column); // skor olarak 0 yani beraberlik skorunu koyariz.
 					}
 
-					// if it's comp's turn, then this must be a win scenario
+					// Move yaptiktan sonra game over olduguna gore kazanma senaryomuz gerceklesti
 					currentMove = new Connect4Move(WEIGTH_OF_WINNING, column);
 				}
-				// keep going if depth available
+				// daha acilmamis depth var ise acmaya devam edelim
 				else if (depth >= 1){
-					// Switch player perspective
-					// Reduce depth by 1
+					// Minimax algoritmasinda simdi sira karsi kullaniciya gectigi icin perspektifi degistiririz.
+					// ve ayrica depth'i bir azaltiriz
 					currentMove = pickMove(state, depth - 1, -high, -low, view);
-					// transfer values back while changing perspective
 					currentMove.value = (currentMove.value * -1);
 					currentMove.move = column;
 				} else {
 					currentMove = new Connect4Move(state.grabEvalValue(), column);
 				}
-				// Is the current move better than what we've found so far?
+				// Mevcut hamle eger best hamlemizden iyi ise best hamlemizi guncelleriz.
 				if (currentMove.value > bestMove.value){
-					bestMove = currentMove; // replace
-					low = Math.max(bestMove.value, low); // update the achievable lower bound value
+					bestMove = currentMove;
+					low = Math.max(bestMove.value, low); // Ve ayrica elde edilebilecek lower boundu guncelleriz.
 				}
-				// undo move before trying next move
+				// Bir sonraki hamleyi yapmadan once mevcut hamleyi undo yapariz.
 				state.undoMove(column, evalValue);
 			}
 		}
@@ -103,36 +87,28 @@ public class ComputerConnect4Player extends Player {
 
 
 	/**
-	 * Check the move list for their associated values
-	 * Then sort them by value
 	 *
-	 * @param state the current state of the game
-	 * @return an array of moves sorted by their values
+	 * @param state mevcut oyun durumu
+	 * @return skoru en cokdan aza dogru siralanmis hamle arrayi
 	 */
 	private static Connect4Move[] checkMoves(Connect4Game state){
-		int stateEval; // evaluation of current state based on unblocked 4 in rows
+		int stateEval;
 		Connect4Move[] movesArray = new Connect4Move[Connect4Game.COLS];
 
 		stateEval = state.grabEvalValue();
 
-		// go through each column in move list
 		for (int i = 0; i < Connect4Game.COLS; i++){
 			int theMove = movesByCol[i];
 
 			movesArray[i] = new Connect4Move(-Integer.MAX_VALUE, theMove);
 			if (state.isValidMove(theMove)){
-				// try the move
 				state.makeMove(theMove);
-
-				// now evaluate the new state and store value to check against later
 				movesArray[i].value = state.grabEvalValue();
-
-				// undo the state before checking again
 				state.undoMove(theMove, stateEval);
 			}
 		}
 
-		// sort the move lists by values
+		// hamle listesi sort edilir.
 		for (int i = 1; i < Connect4Game.COLS; i++){
 			for (int compare = i; (compare >=1 && movesArray[compare].value >
 			movesArray[compare - 1].value);
@@ -145,18 +121,16 @@ public class ComputerConnect4Player extends Player {
 
 		}
 
-		// new set of moves with updated values
 		return movesArray;
 	}
 
 	/**
-	 * Helper method that counts the moves made
+	 * Suana kadar yapilmis hamle sayisini olcer.
 	 *
-	 * @param state the input state of the board
-	 * @return the number of moves already made
+	 * @param state grid state'i
+	 * @return suana kadar yapilmis hamle sayisi
 	 */
 	private static int movesDone(Connect4State state){
-		// count the pieces
 
 		int counter = 0;
 		for (int row = 0; row < Connect4Game.ROWS; row++){
@@ -170,12 +144,11 @@ public class ComputerConnect4Player extends Player {
 
 
 		/**
-		 * Evalueates the current board
+		 * Mevcut grid skorumuzu heuristigimize gore degerlendirir.
 		 *
-		 * @return a new evaluation value
+		 * @return yeni grid skoru.
 		 */
 		public static int evaluateBoard(Connect4State state){
-			// grab the players
 			char opponent = Connect4State.CHECKERS[(1 - state.getPlayerNum())];
 			char mainPlayer = Connect4State.CHECKERS[state.getPlayerNum()];
 
@@ -219,17 +192,17 @@ public class ComputerConnect4Player extends Player {
 		}
 
 		/**
-		 * Evaluates the possibilities for diagonal and horizontal connect fours
+		 * Olasi yatay, dikey veya capraz connect4 kontrol edebilen method
 		 *
-		 * @param state state
-		 * @param mainPlayer the main player
-		 * @param opponent the other player
-		 * @param i1 column left bound
-		 * @param i2 column right bound
-		 * @param j1 row left bound
-		 * @param j2 row right bound
-		 * @param horizMode horizontal mode switch
-		 * @return the weigth value for these pieces
+		 * @param state grid durum objesi
+		 * @param mainPlayer mevcut oyuncu
+		 * @param opponent rakip oyuncu
+		 * @param i1 satir left bound
+		 * @param i2 satir right bound
+		 * @param j1 sutun left bound
+		 * @param j2 sutun right bound
+		 * @param horizMode horizontal mode switch degeri
+		 * @return hesaplanilmis agirlik degeri
 		 */
 		private static int checkPos(Connect4State state, char mainPlayer, char opponent, int i1, int i2, int j1, int j2, boolean horizMode){
 			int opponentCount = 0;
@@ -249,7 +222,6 @@ public class ComputerConnect4Player extends Player {
 				}
 			}
 			else{
-				//System.out.println("i1= "+i1+", i2= "+i2+", j1= "+j1+", j2= "+j2);
 				if(i1==i2){
 					int i=i1;
 					for(int j=j1;j<=j2;j++){
@@ -290,17 +262,17 @@ public class ComputerConnect4Player extends Player {
 		}
 
 		/**
-		 * Evaluates the possible threats for diagonal and horizontal connect fours
+		 * Olasi yatay, dikey veya capraz connect4larin tehtit durumlarini kontrol eden metod
 		 *
-		 * @param state state
-		 * @param mainPlayer the main player
-		 * @param opponent the other player
-		 * @param i1 column left bound
-		 * @param i2 column right bound
-		 * @param j1 row left bound
-		 * @param j2 row right bound
-		 * @param horizMode horizontal mode switch
-		 * @return the weigth value for these pieces
+		 * @param state grid durum objesi
+		 * @param mainPlayer mevcut oyuncu
+		 * @param opponent rakip oyuncu
+		 * @param i1 satir left bound
+		 * @param i2 satir right bound
+		 * @param j1 sutun left bound
+		 * @param j2 sutun right bound
+		 * @param horizMode horizontal mode switch degeri
+		 * @return hesaplanilmis agirlik degeri
 		 */
 		private static int checkThreat(Connect4State state, char mainPlayer, char opponent, int i1, int i2, int j1, int j2, boolean horizMode){
 			int opponentCount = 0;
@@ -320,7 +292,6 @@ public class ComputerConnect4Player extends Player {
 				}
 			}
 			else{
-				//System.out.println("i1= "+i1+", i2= "+i2+", j1= "+j1+", j2= "+j2);
 				if(i1==i2){
 					int i=i1;
 					for(int j=j1;j<=j2;j++){
@@ -360,21 +331,22 @@ public class ComputerConnect4Player extends Player {
 
 
 			/**
-			 * Public helper method to apply threat weights after looking at Connect 4
-			 * possibilities
+			 * Tehtit etme durumlarinda skor agirliklarini gunceller
 			 *
-			 * @param playerCount the number of pieces player has in the connect 4 line
-			 * @param opponentCount the number of pieces opponent has in the connect 4 line
-			 * @param sum the weighted sum so far
-			 * @return the new sum after applying the weights.
+			 * @param playerCount suanki playera ait bu dortludeki parca sayisi
+			 * @param opponentCount rakip playerdaki bu dortludeki parca sayisi
+			 * @return hesaplanilmis agirlik degeri
 			 */
 			public static int applyThreatWeights(int playerCount, int opponentCount){
-				// apply the weights based on the previous connect 4 possibilities
 				int sum=0;
 
+				//Eger bu dortlu uzerinde bize ait hic parca yok ve rakip oyuncuya ait
+				//3 adet parca varsa bu durum kaybetme durumudur ve agirlikli degeri -WEIGTH_OF_THREAT yapilir.
 				if (playerCount == 0 && opponentCount == 3){
 					sum = -WEIGTH_OF_THREAT;
 				}
+				//Eger bize ait 3 parca var ve diger parca bos ise bu da kazanma durumudur
+				//ve agirlikli degeri WEIGTH_OF_WINNING olur.
 				else if (opponentCount == 0 && playerCount ==3) {
 					sum = WEIGTH_OF_WINNING;
 				}

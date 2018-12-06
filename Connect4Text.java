@@ -1,11 +1,6 @@
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-/**
- * Textual view of the Connect 4 board with interaction from keyboard
- * @author Delos Chang
- *
- */
 
 public class Connect4Text implements Connect4View{
 	private Scanner input;
@@ -15,8 +10,8 @@ public class Connect4Text implements Connect4View{
 	}
 
 	/**
-	 * Displays the current board
-	 * @param state current state of the game
+	 * Mevcut gridi ekrana bastirir.
+	 * @param state oyun durumu
 	 */
 	public void display(Connect4State state){
 		char [][] board = state.getBoard();
@@ -40,10 +35,9 @@ public class Connect4Text implements Connect4View{
 	}
 
 	/**
-	 * Asks the user for a move
-	 * The move will be in the range 0 to Connect4State.COLS-1.
-	 * @param state current state of the game
-	 * @return the number of the move that player chose
+	 * Kullanicidan hamle ister
+	 * @param state oyun state'i
+	 * @return yapilacak olan hamlenin sutun nosu
 	 */
 	public int getUserMove(Connect4State state){
 		Scanner column;
@@ -54,12 +48,11 @@ public class Connect4Text implements Connect4View{
 
 		column = new Scanner(System.in);
 
-		// validity checks
 		for(;;) {
 		    if(!column.hasNextInt() ) {
 		        System.out.println("Integers from 0 to 6 allowed.");
 						System.out.println("Please pick a column");
-		        column.next(); // discard
+		        column.next();
 		        continue;
 		    }
 		    choose = column.nextInt();
@@ -79,25 +72,23 @@ public class Connect4Text implements Connect4View{
 	}
 
 	/**
-	 * Reports the move that a player has made.
-	 * The move should be in the range 0 to Connect4State.COLS-1.
-	 * @param chosenMove the move to be reported
-	 * @param name the player's name
+	 * Yapilan hamleyi report eder.
+	 * @param chosenMove yapilmis hamle
+	 * @param name player ismi
 	 */
 	public void reportMove (int chosenMove, String name){
 		System.out.println("\n" + name + " chooses the column " + chosenMove);
 	}
 
 	/**
-	 * Ask the user the question and return the answer as an int
-	 * @param question the question to ask
-	 * @return The depth the player chose
+	 * Kullaniciya question valuesunda bir soru sorar ve bir int cevabi alir.
+	 * @param question sorulacak soru
+	 * @return int tipinde cevap
 	 */
 	public int getIntAnswer (String question){
 		int answer = 0;
 		boolean valid = false;
 
-		// Ask question
 		System.out.println(question + " ");
 
 		while (!valid){
@@ -109,23 +100,21 @@ public class Connect4Text implements Connect4View{
 				valid = false;
 			}
 		}
-
 		return answer;
-
 	}
 
 	/**
-	 * Convey a message to user
-	 * @param message the message to be reported
+	 * Usera mesaj gonderir.
+	 * @param message gonderilecek mesaj
 	 */
 	public void reportToUser(String message){
 		System.out.println(message);
 	}
 
 	/**
-	 * Ask the question and return the answer
-	 * @param question the question to ask
-	 * @return the answer to the question
+	 * Kullaniciya question sorusunu sorar ve string cevabi alir
+	 * @param question sorulacak soru
+	 * @return cevap
 	 */
 	public String getAnswer(String question){
 		System.out.println(question + " ");

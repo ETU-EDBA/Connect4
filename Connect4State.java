@@ -1,8 +1,3 @@
-/**
- * An interface for the game state of the Connect 4 game.
- * 
- * @author Scot Drysdale
- */
 public interface Connect4State {
   public final static int ROWS = 6;            // Board height
   public final static int COLS = 7;            // Board width
@@ -10,57 +5,54 @@ public interface Connect4State {
   public final static char CHECKER0 = 'X';     // Indicate the first player's checker
   public final static char CHECKER1 = 'O';     // Indicate second player's checker
   public final static char [] CHECKERS = {CHECKER0, CHECKER1};
-  
-  /**
-   * Gets a 2-D array representing the board.
-   * The first subscript is the row number and the second the column number.
-   * The bottom of the board is row 0 and the top is row ROWS-1.
-   * The left side of the board is column 0 and the right side is column COLS-1.
-   * @return the board
-   */
+
+	/**
+	 * Connect4 tahtasinin 2 boyutlu ifade edilmis olunan grid degeri dondurulur.
+	 * @return grid arrayi dondurulur
+	 */
   public char [][] getBoard();
-  
+
   /**
-   * Gets an array holding 2 Player objects
-   * @return the players
+   * Player arrayini dondurur
+   * @return player arrayi
    */
   public Player [] getPlayers();
-  
+
   /**
-   * Gets the number of the player whose move it is
-   * @return the number of the player whose move it is
+   * Hamleyi yapan playerin no su dondurulur
+   * @return player no
    */
   public int getPlayerNum ();
-  
+
   /**
-   * Gets the Player whose turn it is to move
-   * @return the Player whose turn it is to move
+   * Suandaki hamleyi yapacak player no dondurulur
+   * @return player no
    */
   public Player getPlayerToMove();
 
   /**
-   * Is this move valid?
-   * @param col column where we want to move
-   * @return true if the move is valid
+   * Hamlenin valid olup olmadigi kontrol edilir
+   * @param col sutun no
+   * @return eger valid ise true dondurulur
    */
   public boolean isValidMove(int col);
-  
+
   /**
-   * Make a move, dropping a checker in the given column
-   * @param col the column to get the new checker
+   * Grid uzerinde bir hamle yapar
+   * @param col sutun no
    */
   public void makeMove(int col);
-  
- 
+
+
   /**
-   * Is the board full?
-   * @return true if the board is full
-   */
+	 * Gridin dolu olup olmadigini kontrol eder
+	 * @return Eger grid dolu ise true doner.
+	 */
   public boolean isFull();
 
   /**
-   * Decides if the game is over
-   * @return true iff the game is over
-   */
+	 * Oyunun bitip bitmedigine karar verir.
+	 * @return Oyun bitmis ise true dondurulur.
+	 */
   public boolean gameIsOver();
 }

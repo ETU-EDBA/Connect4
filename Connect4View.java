@@ -1,50 +1,42 @@
-/**
- * View for Connect 4 game (in model-view-controller pattern)
- * Displays the game and interacts with the user
- * @author Scot Drysdale
- */
-
 public interface Connect4View {
 
 	/**
-	 * Displays the current board
-	 * @param state current state of the game
+	 * Mevcut gridi goruntuler
+	 * @param state oyun state'i
 	 */
 	public void display (Connect4State state);
 
 	/**
-	 * Asks the user for a move
-	 * The move will be in the range 0 to Connect4State.COLS-1.
-	 * @param state current state of the game
-	 * @return the number of the move that player chose
+	 * Kullanicidan hamle ister
+	 * @param state oyun state'i
+	 * @return kullanicinin sectigi hamleyi dondurur.
 	 */
 	public int getUserMove(Connect4State state);
 
 	/**
-	 * Reports the move that a player has made.
-	 * The move should be in the range 0 to Connect4State.COLS-1.
-	 * @param chosenMove the move to be reported
-	 * @param name the player's name
+	 * Kullanicinin yaptigi hamleyi report eder.
+	 * @param chosenMove yapilan hamle
+	 * @param name kullanici ismi
 	 */
 	public void reportMove (int chosenMove, String name);
 
 	/**
-	 * Ask the user the question and return the answer as an int
-	 * @param question the question to ask
-	 * @return The depth the player chose
+	 * Kullaniciya soru sorar ve int tipinde cevap alir.
+	 * @param question sorulacak soru
+	 * @return int cevabi
 	 */
 	public int getIntAnswer (String question);
 
 	/**
-	 * Convey a message to user
-	 * @param message the message to be reported
+	 * Usera mesaj report eder
+	 * @param message gonderilecek mesaj
 	 */
 	public void reportToUser(String message);
 
 	/**
-	 * Ask the question and return the answer
-	 * @param question the question to ask
-	 * @return the answer to the question
+	 * Kullaniciya soru sorar ve string tipinde cevap alir.
+	 * @param question sorulacak soru
+	 * @return string cevabi
 	 */
 	public String getAnswer(String question);
 }

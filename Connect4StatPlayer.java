@@ -1,8 +1,9 @@
 public class Connect4StatPlayer extends Player {
 
 	/**
-	 * Constructor to create the human player with a given name
-	 * @param name name of the human player
+	 * Stat player olusturur, stat player verilmis plays string degerini tahta uzerinde oynatir.
+	 * @param name player ismi
+	 * @param plays plays listesi, or liste: 2234561 
 	 */
 	 String plays;
 	 int counter;

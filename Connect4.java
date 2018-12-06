@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-
 import java.lang.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -8,14 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
-
-/**
- * Connect4.java
- *
- * Controller that plays the connect 4 game.
- * @author Delos Chang
- *
- */
 
 public class Connect4 {
 
@@ -28,6 +19,10 @@ public class Connect4 {
 		}
 		return sum/arr.size();
 	}
+
+	/**
+	* Verilen filename'e ait datasetler üzerinde h1 ve h2 heuristigi uzerinde denemeler yapar
+	*/
 	public static List<List<Result>> playGame(String fileName, int depth, Connect4View view){
 		List list = new ArrayList<List>();
 		try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
@@ -61,7 +56,6 @@ public class Connect4 {
 					players[1] = new ComputerConnect4Player(playerName, depth);
 					Connect4Game state = new Connect4Game(0, players, tmpState.getBoard(), tmpState.getMovesPlayed(), tmpState.grabEvalValue());
 
-					// Hold current game state
 					while (!state.gameIsOver()){
 						int move = state.getPlayerToMove().getMove(state, view);
 						state.makeMove(move);
@@ -103,7 +97,6 @@ public class Connect4 {
 		String answer = "";
 		Connect4View view;
 
-		// Ask for either text or view
 		while (!(answer.toLowerCase().contains("demo") || answer.toLowerCase().contains("istatistik"))){
 			System.out.println("Demo / Istatistik Seciniz: ");
 			answer = input.nextLine();
@@ -113,8 +106,6 @@ public class Connect4 {
 			view = new Connect4Graph();
 			Player [] players = new Player[2];
 
-			// Initialize the game
-			// Computer - for computer
 			ComputerConnect4Player.hChoice=true;
 
 			String playerName = view.getAnswer("Ilk oyuncunun adini giriniz:" +
@@ -144,7 +135,6 @@ public class Connect4 {
 			Connect4Game state = new Connect4Game(0, players);
 			view.display(state);
 
-			// Hold current game state
 			while (!state.gameIsOver()){
 				int move = state.getPlayerToMove().getMove(state, view);
 
@@ -153,8 +143,6 @@ public class Connect4 {
 				view.display(state);
 			}
 
-			// The game is over
-			// declare the winner!
 			view.reportToUser(state.getPlayers()[1 - state.getPlayerNum()].getName() + " won!");
 
 		}
@@ -170,7 +158,6 @@ public class Connect4 {
 
 
 
-			//System.out.println("H1 : " + result_H1.toString() );
 			long average1 = averageTime(result_H1);
 
 			int numberOfWins1 = 0;
@@ -210,8 +197,6 @@ public class Connect4 {
 
 
 
-
-			//System.out.println("H2 : " + result_H2.toString() );
 			long average2 = averageTime(result_H2);
 			int numberOfWins2 = 0;
 			int numberOfLoses2 = 0;
@@ -244,12 +229,6 @@ public class Connect4 {
 			 + "Oyunlar ortalama " + average2 + "ms surmustur.\n"
 			 + "Kullanilan data set uzerinde dogru tahmin orani = % "+((1.0*numberOfSuccess2/(numberOfSuccess2+numberOfFails2))*100) );
 
-
-
-
 		}
-
-
-
 	}
 }

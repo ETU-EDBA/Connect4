@@ -1,33 +1,25 @@
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-/**
- * Connect4Game.java
- *
- * Represents the state of the Connect 4 game.
- *
- * @author Delos Chang
- *
- */
+
 
 public class Connect4Game implements Connect4State{
 	private char[][] board;
 	private Player [] players;
-	private int playerToMoveNum; // 0 or 1 for which player to go
+	private int playerToMoveNum; // Mevcut hamle sirasinin hangi oyuncuda oldugunu tutar.
 
-	private int latestRow = -1; // latest row added to by makeMove method
-	private int latestCol = -1; // latest column added to by makeMove method
+	private int latestRow = -1; // en son yapilan hamlenin satirinin numarasi
+	private int latestCol = -1; // en son yapilan hamlenin sutununun numarasi
 
-	private int movesDone; // number of moves made
+	private int movesDone; // Suana kadar yapilmis hamle sayisi
 
-	private int evalValue; // evaluation of unblocked four-in-row for both players
+	private int evalValue; // Mevcut gridin skor degeri(Pozitif ise avantaj ilk kullanicida, negatif ise ikinci kullanicida, 0 ise avantaj yok)
 
 
 	/**
-	 * Constructs game in initial state
+	 * Game'i initialize eder
 	 *
-	 * @param playerNum the player whose move it is
-	 * @param thePlayers the player objects
-	 * @param aView the view in the model-view-controller model
+	 * @param playerNum ilk hamleyi yapacak kullanici
+	 * @param thePlayers player obje arrayleri
 	 */
 	public Connect4Game(int playerNum, Player [] thePlayers){
 		board = new char[ROWS][COLS];
@@ -47,28 +39,26 @@ public class Connect4Game implements Connect4State{
 	/**
 	 * Construct the game with input states
 	 *
-	 * @param playerNum the player whose move it is
-	 * @param thePlayers the player objects
-	 * @param initialBoard the board input with requisite pieces
-	 * @param movesMade the number of moves already made
-	 * @param unblockedTotal a total int evaluation of unblocked four-in-row for opp and computer
+	 * @param playerNum ilk hamleyi yapacak kullanici
+	 * @param thePlayers player obje arrayleri
+	 * @param initialBoard baslanilacak olan grid degerleri
+	 * @param movesMade suana kadar yapilmis hamle sayisi
+	 * @param unblockedTotal suanki grid skor degeri
 	 */
 	public Connect4Game(int playerNum, Player[] thePlayers, char[][] initialBoard, int movesMade, int unblockedTotal){
-		// Initialize board with rows and columns
+		// ROWS ve COLS kullanilarak grid initialize edilir.
 		board = new char[ROWS][COLS];
 
-		// Replicate the board
+		// Yeni grid kopyalanir.
 		for (int row = 0; row < ROWS; row++){
 			for (int column = 0; column < COLS; column++){
 				board[row][column] = initialBoard[row][column];
 			}
 		}
 
-		// Replicate the players and moves made etc.
 		playerToMoveNum = playerNum;
 		players = thePlayers;
 
-		// Replicate the evaluation value
 		movesDone = movesMade;
 		evalValue = unblockedTotal;
 	}
@@ -76,12 +66,8 @@ public class Connect4Game implements Connect4State{
 
 	@Override
 	/**
-	 * Gets a 2-D array representing the board.
-	 * The first subscript is the row number and the second the column number.
-	 * The bottom of the board is row 0 and the top is row ROWS-1.
-	 * The left side of the board is column 0 and the right side is column COLS-1.
-	 *
-	 * @return the board
+	 * Connect4 tahtasinin 2 boyutlu ifade edilmis olunan grid degeri dondurulur.
+	 * @return grid arrayi dondurulur
 	 */
 	public char[][] getBoard() {
 		return board;
@@ -98,16 +84,16 @@ public class Connect4Game implements Connect4State{
 	}
 
 	/**
-	 * Gets number of moves played
-	 * @return number of moves played so far
+	 * Suana kadar oynanmis hamle sayisi dondurulur.
+	 * @return yapilmis hamle sayisi dondurulur.
 	 */
 	public int getMovesPlayed(){
 		return movesDone;
 	}
 
 	/**
-	 * Returns the evaluation value for a given position
-	 * @return the evaluation value
+	 * Gride ait skor degeri dondurulur
+	 * @return grid skor degeri dondurulur.
 	 */
 	public int grabEvalValue(){
 		return evalValue;
@@ -120,7 +106,7 @@ public class Connect4Game implements Connect4State{
 
 	@Override
 	public boolean isValidMove(int col) {
-		// move is valid if the top column isn't full
+		// Eger bu sutun full degil ise bu hamle validdir.
 		if (col >= 0 && col < 7){
 			return !isColumnFull(col);
 		}else{
@@ -130,46 +116,39 @@ public class Connect4Game implements Connect4State{
 	}
 
 	/**
-	 * Make a move, dropping a checker in the given column
-	 * @param col the column to get the new checker
+	 * Grid uzerinde bir hamle yapar
+	 * @param col the sutun no
 	 */
 	@Override
 	public void makeMove(int col) {
-		// first check if the move is valid
+		// hamlenin valid olup olmadigi kontrol edilir.
 		if (isValidMove(col)){
 			int openRow = findOpenRow(col);
 
-			// Switch player
+
 			playerToMoveNum = 1 - playerToMoveNum;
 
-			// Switch evaluation for player and computer
 			evalValue = -1 * evalValue;
 
-			// Evaluation steps
+			board[openRow][col] = CHECKERS[getPlayerNum()];
+			evalValue = ComputerConnect4Player.evaluateBoard(this);
 
-			board[openRow][col] = CHECKERS[getPlayerNum()]; // add the checker
-			evalValue = ComputerConnect4Player.evaluateBoard(this); // reevaluate with new piece in place
-
-			// Increment moves done
 			movesDone++;
 
-			// Update latest row/cols
 			latestRow = openRow;
 			latestCol = col;
 		} else {
-			// because it was not a valid move
 			throw new IllegalStateException("Column is full!");
 		}
 	}
 
 	/**
-	 * Find the first empty row in a column
-	 * -1 if the column is full (no empty row)
+	 * Verilen sutun uzerindeki ilk bos satir elde edilir
+	 * Eger sutun dolu ise -1 dondurulur
 	 *
-	 * @param col the column to check
+	 * @param col sutun no
 	 */
 	private int findOpenRow(int col){
-		// find the first row that isn't filled
 		for (int i = 0; i < ROWS; i++){
 			if (board[i][col] == EMPTY){
 				return i;
@@ -180,36 +159,32 @@ public class Connect4Game implements Connect4State{
 	}
 
 	/**
-	 * Finds the first occupied slot of a column
+	 * Sutun uzerindeki ilk dolu slotu elde eder
 	 *
-	 * @param col the column to check
-	 * @return the first occupied slot of a column
+	 * @param col kontrol edilecek sutun
 	 */
 	private int findTop(int col){
-		// find the top of the closed row
 		int row = ROWS - 1;
-
 		while (board[row][col] == EMPTY && row > 0){
 			row--;
 		}
-
 		return row;
 
 	}
 
 	/**
-	 * Undo the move to avoid creating a new state each time
+	 * Verilen hamleyi geri alir ve state puanimizi eski haline getirir.
 	 *
-	 * @param column column to undo
-	 * @param stateEval static evaluation at that time
+	 * @param column undo yapilacak olan sutun, en ustteki tas en son konuldugu icin sutun numarasi yeterlidir.
+	 * @param stateEval hamleden onceki grid degerlendirme puani
 	 */
 	public void undoMove(int column, int stateEval){
 		int row = this.findTop(column);
 
-		// change back to empty
+		// grid uzerindeki bu hucreyi bosa dondurulur
 		board[row][column] = EMPTY;
 
-		// change other parameters to original
+		// Oynama sirasini bir onceki oyuncuya getirir.
 		playerToMoveNum = 1 - playerToMoveNum;
 
 		evalValue = stateEval;
@@ -217,18 +192,18 @@ public class Connect4Game implements Connect4State{
 	}
 
 	/**
-	 * Is column full?
+	 * Sutunun dolu olup olmadigini kontrol eder
 	 *
-	 * @param col the column to check
-	 * @return true if the column is full
+	 * @param col kontrol edilecek sutun
+	 * @return eger sutun dolu ise true dondurulur, diger durumlarda false dondurulur.
 	 */
 	private boolean isColumnFull(int col) {
 		return !(board[ROWS - 1][col] == EMPTY);
 	}
 
 	/**
-	 * Is the board full?
-	 * @return true if the board is full
+	 * Gridin dolu olup olmadigini kontrol eder
+	 * @return Eger grid dolu ise true doner.
 	 */
 	@Override
 	public boolean isFull() {
@@ -237,26 +212,25 @@ public class Connect4Game implements Connect4State{
 
 
 	/**
-	 * Evaluates four-in-row for game-over method
+	 * Herhangi bir 4'lu ile kazanilip kazanilmadigini karar verir
 	 *
-	 * @param row latest row that a move was made on
-	 * @param column latest column that a move was made on
-	 * @param rowOffset a row offset to calculate different connect 4 possibilities
-	 * @param colOffset a row offset to calculate different connect 4 possibilities
-	 * @return boolean true if there is a win
+	 * @param row son yapilan hamlenin satir numarasi
+	 * @param column son yapilan hamlenin sutun numarasi
+	 * @param rowOffset row offset
+	 * @param colOffset col offset
+	 * @return Eger bir dortlu bulunmus ise true dondurulur.
 	 */
 	private boolean checkForFour(int row, int column,
 			int rowOffset, int colOffset){
 
 		int winCounter = 0; // counts to 4 for win
 
-		// Find opp ends for the possible Connect 4
+		// Olasi 4lu icin diger uc taraf elde edilir.
 		int oppRow = 3 * rowOffset + row;
 		int oppColumn = 3 * colOffset + column;
 
-		// conditions where Connect 4 is impossible
-		// less than 7 moves (counting both players)
-		// adjusted offset for row/col is < 0 or > maximum
+		// imkansiz durumlari denememek amaciyla bazi durum kontrolleri yapilmistir.
+		// toplam hamlenin 7 hamleden az olmasi
 		if ( (movesDone < 7 ) || (oppRow >= ROWS) || (oppColumn >= COLS) ||
 				(oppRow < 0) || (oppColumn < 0) ||
 				(row < 0) || (column < 0) ||
@@ -270,80 +244,42 @@ public class Connect4Game implements Connect4State{
 				winCounter++;
 			}
 
-			// Adjust offsets and look for the next piece
-			// that would lead to a four-in-row.
+			// Offsetleri guncelleyerek bir sonraki hucreye bakmamiz ayarlanir.
 			row += rowOffset;
 			column += colOffset;
 		}
 
-		// Got a connect 4!
+		// Eger 4lu elde edilmisse true dondurulur
 		return (winCounter == 4);
 	}
 
 	/**
-	 * Decides if game is over
-	 * @return true iff the game is over
+	 * Oyunun bitip bitmedigine karar verir.
+	 * @return Oyun bitmis ise true dondurulur.
 	 */
 	@Override
 	public boolean gameIsOver() {
-		// Check if game is complete
+		// Gridin dolu olup olmadigi kontrol edilir.
 		if ( isFull() ){
 			return true;
 		}
 
-		// Check vertical four-in-row
+		// Dikey dortluler kontrol edilir.
 		if ( checkForFour(latestRow, latestCol, -1, 0)) return true;
 
 		for (int offset = 0; offset < 4; offset++){
-			// Check horizontal four-in-row
+			// Yatay dortluler kontrol edilir.
 			if ( checkForFour(latestRow, latestCol - offset, 0, 1)) return true;
 
-			// Check diagonal via lower right
+			// Pozitif capraz kontrol edilir.
 			if ( checkForFour(latestRow - offset, latestCol + offset, 1, -1)) return true;
 
-			// Check diagonal via upper right
+			// Negatif capraz kontrol edilir.
 			if ( checkForFour(latestRow - offset, latestCol - offset, 1, 1)) return true;
 		}
 
 		return false;
 	}
 
-	/**
-	 * Test function to check the static evaluation function
-	 * @param args
-	 */
-	public static void main(String[] args){
-		/*
-		Player[] players = new Player[2];
-		players[0] = new Connect4HumanPlayer("Test1");
-		players[1] = new Connect4HumanPlayer("Test2");
-
-		// Initialize test game
-		Connect4Game gameOne = new Connect4Game(0, players);
-		Connect4Game gameTwo = new Connect4Game(0, players);
-		Connect4View view = new Connect4ViewGraphical();
-
-		while (!gameOne.gameIsOver()){
-			int column = gameTwo.getPlayerToMove().getMove(gameTwo, view);
-			gameTwo.makeMove(column);
-
-			int evaluation = gameOne.grabEvalValue();
-			gameOne.makeMove(column); // make the same move
-
-			gameOne.undoMove(column, evaluation);
-			gameOne.makeMove(column);
-
-			int new_eval = gameOne.grabEvalValue();
-			int compEval = ComputerConnect4Player.evaluate(gameTwo);
-
-			System.out.println("The following evaluation numbers in the game should match.");
-			System.out.println("Player One " + new_eval);
-			System.out.println("Player Two " + compEval);
-			view.display(gameOne);
-
-
-		}
-		*/
-	}
 
 }

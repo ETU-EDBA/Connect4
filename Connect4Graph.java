@@ -23,15 +23,18 @@ public class Connect4Graph  implements Connect4View {
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//Set up the content pane.
-		GridLayout gridLay = new GridLayout(0,7, 10, 10);
+		GridLayout gridLay = new GridLayout(0,7, 15, 15);
 		panel=new JPanel();
   	panel.setLayout(gridLay);
 		grid=new JLabel[Connect4State.ROWS][];
 		for (int row = Connect4State.ROWS - 1; row > -1; row--){
 			grid[row]=new JLabel[Connect4State.COLS];
 			for (int column = 0; column < Connect4State.COLS; column++){
-				grid[row][column] = new JLabel(String.valueOf("."), SwingConstants.CENTER);
-				grid[row][column] .setBorder(BorderFactory.createLineBorder(Color.black));
+				grid[row][column] = new JLabel(String.valueOf(""), SwingConstants.CENTER);
+				grid[row][column].setBorder(BorderFactory.createLineBorder(Color.black));
+				grid[row][column].setBackground(Color.WHITE);
+				grid[row][column].setOpaque(true);
+
 				panel.add(grid[row][column] , BorderLayout.CENTER);
 			}
 		}
@@ -62,7 +65,19 @@ public class Connect4Graph  implements Connect4View {
 		char [][] board = state.getBoard();
 		for (int row = Connect4State.ROWS - 1; row > -1; row--){
 			for (int column = 0; column < Connect4State.COLS; column++){
-				grid[row][column].setText(String.valueOf(board[row][column]));
+				//grid[row][column].setText(String.valueOf(board[row][column]));
+				if(board[row][column]=='X'){
+					grid[row][column].setBackground(Color.blue);
+					grid[row][column].setOpaque(true);
+				}
+				else if(board[row][column]=='O'){
+					grid[row][column].setBackground(Color.red);
+					grid[row][column].setOpaque(true);
+				}
+				else{
+					grid[row][column].setBackground(Color.WHITE);
+					grid[row][column].setOpaque(true);
+				}
 			}
 		}
 	}
