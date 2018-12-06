@@ -1,3 +1,7 @@
+mkdir out
+cd out
 del *.class
 javac *.java
-java Connect4
+jar cfe ../Bil441-Connect4.jar Connect4 *.class
+cd ../
+java -jar Bil441-Connect4.jar
