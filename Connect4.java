@@ -110,7 +110,7 @@ public class Connect4 {
 		}
 
 		if (answer.toLowerCase().contains("demo")){
-			view = new Connect4ViewGraphical();
+			view = new Connect4Graph();
 			Player [] players = new Player[2];
 
 			// Initialize the game

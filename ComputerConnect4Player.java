@@ -8,8 +8,8 @@ public class ComputerConnect4Player extends Player {
 	// the closer a piece is to the center, the more 4-in-row permutations available.
 	// i.e.., generally center piece is most valuable
 	private static final int[] movesByCol = { 3, 4, 2, 5, 1, 6, 0 };
-	private static final int WEIGTH_OF_THREAT = 10^3;
-	private static final int WEIGTH_OF_WINNING = 10^5;
+	private static final int WEIGTH_OF_THREAT = 1000;
+	private static final int WEIGTH_OF_WINNING = 100000;
 
 	/**
 	 * Create a computer player with a given name
@@ -183,27 +183,38 @@ public class ComputerConnect4Player extends Player {
 			int vertValue=0;
 			int diagPValue=0;
 			int diagNValue=0;
+			int winLoseValue=0;
 
 			for(int i=0;i<Connect4State.ROWS-3;i++){
 				for(int j=0;j<Connect4State.COLS;j++){
 					vertValue += checkPos(state, mainPlayer, opponent, i, i+3, j, j, false);
+					if(hChoice){
+						winLoseValue += checkThreat(state, mainPlayer, opponent, i, i+3, j, j, false);
+					}
 				}
 			}
 
 			for(int i=0;i<Connect4State.ROWS;i++){
 				for(int j=0;j<Connect4State.COLS-3;j++){
 					horizValue += checkPos(state, mainPlayer, opponent, i, i, j, j+3, false);
+					if(hChoice){
+						winLoseValue += checkThreat(state, mainPlayer, opponent, i, i, j, j+3, false);
+					}
 				}
 			}
 			for(int i=0;i<Connect4State.ROWS-3;i++){
 				for(int j=0;j<Connect4State.COLS-3;j++){
 					diagPValue += checkPos(state, mainPlayer, opponent, i, i+3, j, j+3, false);
 					diagNValue += checkPos(state, mainPlayer, opponent, i+3, i, j, j+3, true);
+					if(hChoice){
+						winLoseValue += checkThreat(state, mainPlayer, opponent, i, i+3, j, j+3, false);
+						winLoseValue += checkThreat(state, mainPlayer, opponent, i+3, i, j, j+3, true);
+					}
+
 				}
 			}
 			// now return the total value of horizontal, vertical and diagonals
-			int sum = horizValue + vertValue + diagPValue + diagNValue;
-
+			int sum = horizValue + vertValue + diagPValue + diagNValue+winLoseValue;
 			return sum;
 		}
 
@@ -226,35 +237,130 @@ public class ComputerConnect4Player extends Player {
 			char[][] board= state.getBoard();
 			if(horizMode==true){
 				int j=j1;
-				for(int i=i1;i>=i2 && j<=j2; i--, j++){
+				for(int i=i1;i>=i2 && j<=j2; i--){
 
 					if (board[i][j] == opponent){
 						opponentCount++;
 					} else if (board[i][j] == mainPlayer){
 						playerCount++;
 					}
+					j++;
 
 				}
 			}
 			else{
+				//System.out.println("i1= "+i1+", i2= "+i2+", j1= "+j1+", j2= "+j2);
+				if(i1==i2){
+					int i=i1;
+					for(int j=j1;j<=j2;j++){
+						if (board[i][j] == opponent){
+							opponentCount++;
+						} else if (board[i][j] == mainPlayer){
+							playerCount++;
+						}
+					}
+				}
+				else if(j1==j2){
+					int j=j1;
+					for(int i=i1;i<=i2;i++){
+						if (board[i][j] == opponent){
+							opponentCount++;
+						} else if (board[i][j] == mainPlayer){
+							playerCount++;
+						}
+					}
+				}
+				else{
+					int j=j1;
+					for(int i=i1;i<=i2;i++){
+						if (board[i][j] == opponent){
+							opponentCount++;
+						} else if (board[i][j] == mainPlayer){
+							playerCount++;
+						}
+						j++;
+					}
+				}
+
+			}
+			if (opponentCount == 0){
+				return 1;
+			}
+			else return 0;
+		}
+
+		/**
+		 * Evaluates the possible threats for diagonal and horizontal connect fours
+		 *
+		 * @param state state
+		 * @param mainPlayer the main player
+		 * @param opponent the other player
+		 * @param i1 column left bound
+		 * @param i2 column right bound
+		 * @param j1 row left bound
+		 * @param j2 row right bound
+		 * @param horizMode horizontal mode switch
+		 * @return the weigth value for these pieces
+		 */
+		private static int checkThreat(Connect4State state, char mainPlayer, char opponent, int i1, int i2, int j1, int j2, boolean horizMode){
+			int opponentCount = 0;
+			int playerCount = 0;
+			char[][] board= state.getBoard();
+			if(horizMode==true){
 				int j=j1;
-				for(int i=i1;i<=i2 && j<=j2; i++,j++){
+				for(int i=i1;i>=i2 && j<=j2; i--){
 
 					if (board[i][j] == opponent){
 						opponentCount++;
 					} else if (board[i][j] == mainPlayer){
 						playerCount++;
 					}
+					j++;
 
 				}
 			}
-			return applyWeights(playerCount, opponentCount);
+			else{
+				//System.out.println("i1= "+i1+", i2= "+i2+", j1= "+j1+", j2= "+j2);
+				if(i1==i2){
+					int i=i1;
+					for(int j=j1;j<=j2;j++){
+						if (board[i][j] == opponent){
+							opponentCount++;
+						} else if (board[i][j] == mainPlayer){
+							playerCount++;
+						}
+					}
+				}
+				else if(j1==j2){
+					int j=j1;
+					for(int i=i1;i<=i2;i++){
+						if (board[i][j] == opponent){
+							opponentCount++;
+						} else if (board[i][j] == mainPlayer){
+							playerCount++;
+						}
+					}
+				}
+				else{
+					int j=j1;
+					for(int i=i1;i<=i2;i++){
+						if (board[i][j] == opponent){
+							opponentCount++;
+						} else if (board[i][j] == mainPlayer){
+							playerCount++;
+						}
+						j++;
+					}
+				}
+
+			}
+			return applyThreatWeights(playerCount, opponentCount);
 		}
 
 
 
 			/**
-			 * Public helper method to apply weights after looking at Connect 4
+			 * Public helper method to apply threat weights after looking at Connect 4
 			 * possibilities
 			 *
 			 * @param playerCount the number of pieces player has in the connect 4 line
@@ -262,22 +368,17 @@ public class ComputerConnect4Player extends Player {
 			 * @param sum the weighted sum so far
 			 * @return the new sum after applying the weights.
 			 */
-			public static int applyWeights(int playerCount, int opponentCount){
+			public static int applyThreatWeights(int playerCount, int opponentCount){
 				// apply the weights based on the previous connect 4 possibilities
 				int sum=0;
 
-				if(hChoice){
-					if (playerCount == 0 && opponentCount == 3){
-						sum += WEIGTH_OF_THREAT;
-					}
-					else if (opponentCount == 0 && playerCount ==3) {
-						sum += WEIGTH_OF_WINNING;
-					}
+				if (playerCount == 0 && opponentCount == 3){
+					sum = -WEIGTH_OF_THREAT;
+				}
+				else if (opponentCount == 0 && playerCount ==3) {
+					sum = WEIGTH_OF_WINNING;
 				}
 
-				if (opponentCount == 0) {
-					sum ++;
-				}
 				return sum;
 			}
 
